@@ -1,15 +1,12 @@
-<<<<<<< HEAD
+import * as React from 'react';
+import hoistNonReactStatic from 'hoist-non-react-statics';
+
 import {
   getBaseComponentPropsFromComponent,
   getBaseComponentPropsFromFiber,
 } from './common';
 import { bailOnError } from '../util/bailer';
-=======
-import * as React from 'react';
-
-import { getBaseComponentProps } from './common';
 import { getComponentDisplayName } from '../util/hocUtil';
->>>>>>> 3c1c07e... WIP
 
 export const autotrackPress = track => (eventType, componentThis, event) => {
   const autotrackProps = getBaseComponentPropsFromComponent(componentThis);
@@ -102,14 +99,13 @@ export const withHeapTouchableAutocapture = track => (TouchableComponent) => {
     }
   }
 
-  // :KLUDGE: By tracking interactions with this node as the hierarchy leaf node, we would effectively break any event definitions that have
-  // 'Touchable<name>' as the leaf if we went with the typical HOC naming convention of 'withHeapTouchableAutocapture(WrappedComponent)'.
-  // Instead, change the display name of this component to the name of TouchableComponent to keep captured hierarchies consistent.
-  // :TODO: (jmtaber129): Consider just appending the display name of 'TouchableComponent' to hierarchies to allow us to follow HOC
-  // conventions here.
   HeapTouchableAutocapture.displayName = `withHeapTouchableAutocapture(${getComponentDisplayName(TouchableComponent)})`;
 
-  return React.forwardRef((props, ref) => {
+  const forwardRefHoc = React.forwardRef((props, ref) => {
     return <HeapTouchableAutocapture {...props} forwardedRef={ref} />;
   });
+
+  hoistNonReactStatic(forwardRefHoc, TouchableComponent);
+
+  return forwardRefHoc;
 }

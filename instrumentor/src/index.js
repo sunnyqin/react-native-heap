@@ -325,6 +325,35 @@ const pressabilityInstrumentationVisitor = {
   },
 };
 
+const TOUCHABLE_COMPONENTS = [
+  'TouchableOpacity',
+  'TouchableNativeFeedback',
+  'TouchableWithoutFeedback',
+  'TouchableHighlight',
+];
+
+const instrumentTouchableHoc = (path) => {
+  if (!TOUCHABLE_COMPONENTS.includes(path.node.id.name)) {
+    return;
+  }
+
+  console.log('is touchable');
+
+  const equivalentExpression = t.classExpression(path.node.id, path.node.superClass, path.node.body, path.node.decorators || []);
+
+  const autotrackExpression = t.callExpression(
+    t.memberExpression(t.identifier('Heap'), t.identifier('withHeapTouchableAutocapture')),
+    [equivalentExpression]
+  );
+
+  const replacement = buildTouchableClassWrapper({
+    TOUCHABLE_ID: path.node.id,
+    CALL_EXPRESSION: autotrackExpression,
+  });
+
+  path.replaceWithMultiple(replacement);
+}
+
 function transform(babel) {
   return {
     visitor: {
@@ -338,29 +367,7 @@ function transform(babel) {
         instrumentSwitchComponent(path);
       },
       ClassDeclaration(path) {
-        if (path.node.id.name === 'Pressability') {
-          path.traverse(pressabilityInstrumentationVisitor);
-        }
-
-        if (path.node.id.name !== 'TouchableOpacity') {
-          return;
-        }
-
-        console.log('is touchable');
-
-        const equivalentExpression = t.classExpression(path.node.id, path.node.superClass, path.node.body, path.node.decorators || []);
-
-        const autotrackExpression = t.callExpression(
-          t.memberExpression(t.identifier('Heap'), t.identifier('withHeapTouchableAutocapture')),
-          [equivalentExpression]
-        );
-
-        const replacement = buildTouchableClassWrapper({
-          TOUCHABLE_ID: path.node.id,
-          CALL_EXPRESSION: autotrackExpression,
-        });
-
-        path.replaceWithMultiple(replacement);
+        instrumentTouchableHoc(path);
       },
     },
   };
