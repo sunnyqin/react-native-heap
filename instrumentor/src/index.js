@@ -20,6 +20,11 @@ const buildStartupWrapper = template(`{
   ORIGINAL_FUNCTION_CALL
 }`);
 
+const buildTouchableClassWrapper = template(`
+  const Heap = require('@heap/react-native-heap').default;
+  const TOUCHABLE_ID = CALL_EXPRESSION;
+`)
+
 const identifierVisitor = {
   Identifier(path) {
     if (path.node.name === 'Touchable') {
@@ -336,6 +341,26 @@ function transform(babel) {
         if (path.node.id.name === 'Pressability') {
           path.traverse(pressabilityInstrumentationVisitor);
         }
+
+        if (path.node.id.name !== 'TouchableOpacity') {
+          return;
+        }
+
+        console.log('is touchable');
+
+        const equivalentExpression = t.classExpression(path.node.id, path.node.superClass, path.node.body, path.node.decorators || []);
+
+        const autotrackExpression = t.callExpression(
+          t.memberExpression(t.identifier('Heap'), t.identifier('withHeapTouchableAutocapture')),
+          [equivalentExpression]
+        );
+
+        const replacement = buildTouchableClassWrapper({
+          TOUCHABLE_ID: path.node.id,
+          CALL_EXPRESSION: autotrackExpression,
+        });
+
+        path.replaceWithMultiple(replacement);
       },
     },
   };
