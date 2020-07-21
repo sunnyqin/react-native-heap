@@ -84,10 +84,15 @@ describe('autotrack instrumentor plugin', () => {
     assert.equal(actual, expected);
   });
 
-  it('touchable should be instrumented', () => {
+  it('touchable should be instrumented with HOC', () => {
     var actual = getActualTransformedFile('is-new-touchable');
     var expected = getExpectedTransformedFile('is-new-touchable');
     assert.equal(actual, expected);
+  });
+
+  it('textinput should be instrumented with HOC', () => {
+    var actual = getActualTransformedFile('is-functional-textinput');
+    console.log(actual);
   });
 });
 

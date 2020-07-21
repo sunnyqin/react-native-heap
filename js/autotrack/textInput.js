@@ -1,5 +1,9 @@
-import { getBaseComponentPropsFromComponent } from './common';
+import * as React from 'react';
+import hoistNonReactStatic from 'hoist-non-react-statics';
 import * as _ from 'lodash';
+
+import { getBaseComponentPropsFromComponent } from './common';
+import { getComponentDisplayName } from '../util/hocUtil';
 
 const DEBOUNCE_PERIOD_MS = 1000;
 
@@ -37,3 +41,49 @@ const debouncedAutocaptureTextInputChange = track => (
 
   track(eventType, autotrackProps);
 };
+
+const NoopTextInput = (props) => {
+  return props.children;
+}
+
+NoopTextInput.displayName = 'TextInput';
+
+export const withHeapTextInputAutocapture = track => (TextInputComponent) => {
+  class HeapTextInputAutocapture extends React.Component {
+    autocaptureTextInputChangeWithDebounce = _.debounce(
+      debouncedAutocaptureTextInputChange(track),
+      DEBOUNCE_PERIOD_MS
+    );
+
+    render() {
+      const { forwardedRef, onChange, ...rest } = this.props;
+
+      return (
+        <TextInputComponent
+          ref={forwardedRef}
+          onChange={(e) => {
+            this.autocaptureTextInputChangeWithDebounce('text_edit', this, e);
+            onChange && onChange(e);
+          }}
+          {...rest}
+        >
+          {this.props.children}
+        </TextInputComponent>
+      )
+    }
+  }
+
+  HeapTextInputAutocapture.displayName = `withHeapTextInputAutocapture(${getComponentDisplayName(TextInputComponent)})`;
+
+  const forwardRefHoc = React.forwardRef((props, ref) => {
+    return (
+      <NoopTextInput>
+        <HeapTextInputAutocapture {...props} forwardedRef={ref} />
+      </NoopTextInput>
+    );
+  });
+
+  hoistNonReactStatic(forwardRefHoc, TextInputComponent);
+
+  return forwardRefHoc;
+}
