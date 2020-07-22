@@ -92,7 +92,8 @@ describe('autotrack instrumentor plugin', () => {
 
   it('textinput should be instrumented with HOC', () => {
     var actual = getActualTransformedFile('is-functional-textinput');
-    console.log(actual);
+    var expected = getExpectedTransformedFile('is-functional-textinput');
+    assert.equal(actual, expected);
   });
 });
 

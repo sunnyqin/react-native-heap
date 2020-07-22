@@ -20,9 +20,9 @@ const buildStartupWrapper = template(`{
   ORIGINAL_FUNCTION_CALL
 }`);
 
-const buildTouchableClassWrapper = template(`
+const buildInstrumentationHoc = template(`
   const Heap = require('@heap/react-native-heap').default;
-  const TOUCHABLE_ID = CALL_EXPRESSION;
+  const COMPONENT_ID = HOC_CALL_EXPRESSION;
 `)
 
 const identifierVisitor = {
@@ -300,31 +300,6 @@ const instrumentStartup = path => {
   }
 };
 
-const pressabilityWrappingTemplate = template(`
-  const Heap = require('@heap/react-native-heap').default;
-  CONFIG_IDENTIFIER = Heap.wrapPressabilityConfig(CONFIG_IDENTIFIER) || CONFIG_IDENTIFIER;
-`);
-
-// Instruments 'Touchable's in RN 0.62+ by passing the 'Pressability' config to the Heap library to wrap the config.  See
-// https://github.com/facebook/react-native/blob/a5151c2b5f6f03896eb7d9df873c5f61a706f055/Libraries/Components/Touchable/TouchableOpacity.js#L139
-// and
-// https://github.com/facebook/react-native/blob/a5151c2b5f6f03896eb7d9df873c5f61a706f055/Libraries/Pressability/Pressability.js#L405-L407.
-const pressabilityInstrumentationVisitor = {
-  ClassMethod(path) {
-    const { node } = path;
-
-    if (node.key.name !== 'constructor') {
-      return;
-    }
-
-    const configWrapExpression = pressabilityWrappingTemplate({
-      CONFIG_IDENTIFIER: node.params[0],
-    });
-
-    path.get('body').unshiftContainer('body', configWrapExpression);
-  },
-};
-
 const TOUCHABLE_COMPONENTS = [
   'TouchableOpacity',
   'TouchableNativeFeedback',
@@ -346,9 +321,9 @@ const instrumentTouchableHoc = (path) => {
     [equivalentExpression]
   );
 
-  const replacement = buildTouchableClassWrapper({
-    TOUCHABLE_ID: path.node.id,
-    CALL_EXPRESSION: autotrackExpression,
+  const replacement = buildInstrumentationHoc({
+    COMPONENT_ID: path.node.id,
+    HOC_CALL_EXPRESSION: autotrackExpression,
   });
 
   path.replaceWithMultiple(replacement);
@@ -366,9 +341,9 @@ const instrumentTextInputHoc = (path) => {
     [equivalentExpression]
   );
 
-  const replacement = buildTouchableClassWrapper({
-    TOUCHABLE_ID: path.node.id,
-    CALL_EXPRESSION: autotrackExpression,
+  const replacement = buildInstrumentationHoc({
+    COMPONENT_ID: path.node.id,
+    HOC_CALL_EXPRESSION: autotrackExpression,
   });
 
   path.replaceWithMultiple(replacement);
