@@ -11,7 +11,7 @@
     "heap",
     "react-native"
   ],
-  "main": "js/Heap",
+  "main": "index.js",
   "files": [
     "instrumentor"
   ],
