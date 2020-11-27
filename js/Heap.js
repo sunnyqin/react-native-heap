@@ -1,7 +1,5 @@
 // Libraries
 import React from 'react';
-import { NativeModules } from 'react-native';
-
 import {
   HeapIgnore,
   HeapIgnoreTargetText,
@@ -20,9 +18,7 @@ import {
 import { withReactNavigationAutotrack } from './autotrack/reactNavigation';
 import { bailOnError } from './util/bailer';
 
-const RNHeap = NativeModules.RNHeap;
-
-export { HeapIgnore, HeapIgnoreTargetText, RNHeap };
+export { HeapIgnore, HeapIgnoreTargetText };
 
 export default {
   bailOnError,

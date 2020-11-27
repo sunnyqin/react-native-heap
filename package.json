@@ -9,18 +9,11 @@
   "keywords": [
     "analytics",
     "heap",
-    "ios",
-    "android",
     "react-native"
   ],
-  "main": "dist/Heap",
+  "main": "js/Heap",
   "files": [
-    "android",
-    "instrumentor",
-    "ios",
-    "dist",
-    "react-native-heap.podspec",
-    "index.d.ts"
+    "instrumentor"
   ],
   "types": "index.d.ts",
   "publishConfig": {
