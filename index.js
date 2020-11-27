@@ -1,3 +1,1 @@
-import { default as Heap } from './src/Heap'
-
-export { Heap }
+export { default } from './src/Heap'

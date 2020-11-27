@@ -18,8 +18,6 @@ import {
 import { withReactNavigationAutotrack } from './autotrack/reactNavigation';
 import { bailOnError } from './util/bailer';
 
-export { HeapIgnore, HeapIgnoreTargetText };
-
 export default {
   bailOnError,
   withHeapTouchableAutocapture,
