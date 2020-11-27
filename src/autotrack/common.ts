@@ -194,6 +194,9 @@ const getHierarchyStringFromTraversal: (
 // :TODO: (jmtaber129): Consider implementing sibling target text.
 const getTargetText: (fiberNode: FiberNode) => string = fiberNode => {
   if (fiberNode.type === 'RCTText') {
+    if (fiberNode.memoizedProps.event) {
+      return fiberNode.memoizedProps.event
+    }
     return fiberNode.memoizedProps.children;
   }
 
