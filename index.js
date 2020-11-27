@@ -1,3 +1,3 @@
-import { default as Heap } from './js/Heap'
+import { default as Heap } from './src/Heap'
 
 export { Heap }

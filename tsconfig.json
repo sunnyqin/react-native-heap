@@ -12,5 +12,5 @@
     "noUnusedParameters": true,
     "moduleResolution": "node"
   },
-  "include": ["js/*", "index.js"]
+  "include": ["src/*", "index.js"]
 }
