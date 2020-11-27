@@ -2,7 +2,7 @@
   "compilerOptions": {
     "types": ["node", "lodash", "jest"],
     "allowJs": true,
-    "outDir": "dist",
+    "outDir": "js",
     "target": "es6",
     "module": "es6",
     "lib": ["es2016"],
@@ -12,5 +12,5 @@
     "noUnusedParameters": true,
     "moduleResolution": "node"
   },
-  "include": ["js/*"]
+  "include": ["js/*", "index.js"]
 }
